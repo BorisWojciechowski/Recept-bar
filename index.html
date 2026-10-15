@@ -147,11 +147,11 @@
     <div class="header-top">
       <div class="brand">BAR RECEPT</div>
       <div class="lang-switcher">
-        <select id="langSelect" onchange="changeLang(this.value)">
+       <select id="langSelect" onchange="changeLang(this.value)">
           <option value="ru">🇷🇺 RU</option>
           <option value="en">🇬🇧 EN</option>
           <option value="th">🇹🇭 TH</option>
-        </select>
+       </select>
       </div>
     </div>
     <div class="categories" id="catNav"></div>
@@ -211,12 +211,64 @@
       {
         catId: "sides",
         catName: { ru: "Гарниры", en: "Side Dishes", th: "เครื่องเคียง" },
+    const menuData = [
+      {
+        catId: "cold",
+        catName: { ru: "Холодные закуски и салаты", en: "Cold Appetizers & Salads", pl: "Zimne przekąski i sałatki" },
         items: [
-          { title: { ru: "Овощи-гриль с сыром рикотта", en: "Grilled Vegetables with Ricotta", th: "ผักย่างย่างกับชีสรีกอตต้า" }, desc: "250гр", price: "1 300 тг" },
-          { title: { ru: "Картофель фри", en: "French Fries", th: "เฟรนช์ฟรายส์" }, desc: "150гр", price: "500 тг" }
+          { title: { ru: "Тар-тар из семги", en: "Salmon Tartare", pl: "Tatar z łososia" }, desc: "250гр", price: "2 400 тг" },
+          { title: { ru: "Филе скумбрии с горячим картофелем", en: "Mackerel Fillet with Hot Potatoes", pl: "Filet z makreli z gorącymi ziemniakami" }, desc: "250гр", price: "1 700 тг" },
+          { title: { ru: "Сырная тарелка", en: "Cheese Platter", pl: "Deska serów" }, desc: "180гр", price: "1 900 тг" },
+          { title: { ru: "Рыбная нарезка", en: "Fish Platter", pl: "Półmisek rybny" }, desc: "200гр", price: "2 700 тг" },
+          { title: { ru: "Нарезка по-казахски", en: "Kazakh Style Meat Platter", pl: "Półmisek mięsny po kazachsku" }, desc: "200гр", price: "3 900 тг" },
+          { title: { ru: "Паштет из говяжей печени", en: "Beef Liver Pate", pl: "Pasztet z wątróbki wołowej" }, desc: "150гр", price: "900 тг" },
+          { title: { ru: "Цезарь с курицей", en: "Chicken Caesar Salad", pl: "Sałatka Cezar z kurczakiem" }, desc: "300гр", price: "1 800 тг" },
+          { title: { ru: "Оливки, маслины", en: "Olives", pl: "Oliwki" }, desc: "150гр", price: "900 тг" },
+          { title: { ru: "Фруктовая нарезка", en: "Fruit Platter", pl: "Półmisek owoców" }, desc: "400гр", price: "5 500 тг" }
+        ]
+      },
+      {
+        catId: "hot_snack",
+        catName: { ru: "Горячие закуски", en: "Hot Appetizers", pl: "Gorące przekąski" },
+        items: [
+          { title: { ru: "Брускетта с говядиной и корнишонами", en: "Bruschetta with Beef & Gherkins", pl: "Bruschetta z wołowiną i korniszonami" }, desc: "180гр", price: "1 300 тг" },
+          { title: { ru: "Брускетта с риккотой и вялеными помидорами", en: "Bruschetta with Ricotta & Sun-dried Tomatoes", pl: "Bruschetta z ricottą i suszonymi pomidorami" }, desc: "150гр", price: "1 100 тг" },
+          { title: { ru: "Тарелка пивных креветок", en: "Beer Shrimps Platter", pl: "Krewetki do piwa" }, desc: "180гр", price: "4 300 тг" },
+          { title: { ru: "Хвосты королевских креветок", en: "King Prawn Tails", pl: "Ogonki krewetek królewskich" }, desc: "180гр", price: "5 200 тг" },
+          { title: { ru: "Стейк-салат с говядиной", en: "Beef Steak Salad", pl: "Sałatka ze stekiem wołowym" }, desc: "300гр", price: "2 200 тг" },
+          { title: { ru: "Сет из колбасок", en: "Sausage Set", pl: "Zestaw kiełbasek" }, desc: "400гр", price: "4 900 тг" },
+          { title: { ru: "Бургер с говядиной", en: "Beef Burger", pl: "Burger z wołowiną" }, desc: "400гр", price: "1 700 тг" }
+        ]
+      },
+      {
+        catId: "soups",
+        catName: { ru: "Супы и выпечка", en: "Soups & Bakery", pl: "Zupy i wypieki" },
+        items: [
+          { title: { ru: "Мексиканский суп с фасолью и говядиной", en: "Mexican Beef & Bean Soup", pl: "Meksykańska zupa z fasolą i wołowiną" }, desc: "400гр", price: "1 900 тг" },
+          { title: { ru: "Хлебная корзина", en: "Bread Basket", pl: "Koszyk pieczywa" }, desc: "200гр", price: "2 200 тг" }
+        ]
+      },
+      {
+        catId: "mains",
+        catName: { ru: "Горячие блюда", en: "Main Courses", pl: "Dania główne" },
+        items: [
+          { title: { ru: "Стейк New York", en: "New York Steak", pl: "Stek New York" }, desc: "200гр", price: "4 300 тг" },
+          { title: { ru: "Пепер-стейк", en: "Pepper Steak", pl: "Stek pieprzowy" }, desc: "200гр", price: "4 200 тг" },
+          { title: { ru: "Рулет из куриной грудки с моцареллой и шпинатом", en: "Chicken Breast Roll with Mozzarella & Spinach", pl: "Roladka z piersi kurczaka z mozzarellą i szpinakiem" }, desc: "250гр", price: "2 400 тг" },
+          { title: { ru: "Бефстроганов с грибами", en: "Beef Stroganoff with Mushrooms", pl: "Boeuf Stroganoff z grzybami" }, desc: "250гр", price: "2 200 тг" },
+          { title: { ru: "Говяжьи ребра «Терияки»", en: "Teriyaki Beef Ribs", pl: "Żeberka wołowe w sosie teriyaki" }, desc: "400гр", price: "4 900 тг" }
+        ]
+      },
+      {
+        catId: "sides",
+        catName: { ru: "Гарниры", en: "Side Dishes", pl: "Dodatki" },
+        items: [
+          { title: { ru: "Овощи-гриль с сыром рикотта", en: "Grilled Vegetables with Ricotta", pl: "Warzywa z grilla z serem ricotta" }, desc: "250гр", price: "1 300 тг" },
+          { title: { ru: "Картофель фри", en: "French Fries", pl: "Frytki" }, desc: "150гр", price: "500 тг" }
         ]
       }
     ];
+
 
     let currentLang = 'ru';
 
