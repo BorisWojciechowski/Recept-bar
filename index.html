@@ -147,11 +147,11 @@
     <div class="header-top">
       <div class="brand">BAR RECEPT</div>
       <div class="lang-switcher">
-       <select id="langSelect" onchange="changeLang(this.value)">
+        <select id="langSelect" onchange="changeLang(this.value)">
           <option value="ru">🇷🇺 RU</option>
           <option value="en">🇬🇧 EN</option>
-          <option value="th">🇹🇭 TH</option>
-       </select>
+          <option value="pl">🇵🇱 PL</option>
+        </select>
       </div>
     </div>
     <div class="categories" id="catNav"></div>
@@ -160,57 +160,6 @@
   <div class="container" id="menuContainer"></div>
 
   <script>
-    const menuData = [
-      {
-        catId: "cold",
-        catName: { ru: "Холодные закуски и салаты", en: "Cold Appetizers & Salads", th: "อาหารว่างเย็นและสลัด" },
-        items: [
-          { title: { ru: "Тар-тар из семги", en: "Salmon Tartare", th: "แซลมอนทาร์ทาร์" }, desc: "250гр", price: "2 400 тг" },
-          { title: { ru: "Филе скумбрии с горячим картофелем", en: "Mackerel Fillet with Hot Potatoes", th: "ฟิลเลต์ปลาแมคเคอเรลกับมันฝรั่งร้อน" }, desc: "250гр", price: "1 700 тг" },
-          { title: { ru: "Сырная тарелка", en: "Cheese Platter", th: "ชีสเพลตเตอร์" }, desc: "180гр", price: "1 900 тг" },
-          { title: { ru: "Рыбная нарезка", en: "Fish Platter", th: "ปลาดิบรวม" }, desc: "200гр", price: "2 700 тг" },
-          { title: { ru: "Нарезка по-казахски", en: "Kazakh Style Meat Platter", th: "จานเนื้อสไตล์คาซัค" }, desc: "200гр", price: "3 900 тг" },
-          { title: { ru: "Паштет из говяжей печени", en: "Beef Liver Pate", th: "ปาเตตับวัว" }, desc: "150гр", price: "900 тг" },
-          { title: { ru: "Цезарь с курицей", en: "Chicken Caesar Salad", th: "ซีซาร์สลัดไก่" }, desc: "300гр", price: "1 800 тг" },
-          { title: { ru: "Оливки, маслины", en: "Olives", th: "มะกอก" }, desc: "150гр", price: "900 тг" },
-          { title: { ru: "Фруктовая нарезка", en: "Fruit Platter", th: "ผลไม้รวม" }, desc: "400гр", price: "5 500 тг" }
-        ]
-      },
-      {
-        catId: "hot_snack",
-        catName: { ru: "Горячие закуски", en: "Hot Appetizers", th: "อาหารว่างร้อน" },
-        items: [
-          { title: { ru: "Брускетта с говядиной и корнишонами", en: "Bruschetta with Beef & Gherkins", th: "บรูสเก็ตต้าเนื้อวัวและเเตงกวาดอง" }, desc: "180гр", price: "1 300 тг" },
-          { title: { ru: "Брускетта с риккотой и вялеными помидорами", en: "Bruschetta with Ricotta & Sun-dried Tomatoes", th: "บรูสเก็ตต้ารีกอตต้าและมะเขือเทศตากแห้ง" }, desc: "150гр", price: "1 100 тг" },
-          { title: { ru: "Тарелка пивных креветок", en: "Beer Shrimps Platter", th: "กุ้งทานกับเบียร์" }, desc: "180гр", price: "4 300 тг" },
-          { title: { ru: "Хвосты королевских креветок", en: "King Prawn Tails", th: "หางกุ้งคิงพราวน์" }, desc: "180гр", price: "5 200 тг" },
-          { title: { ru: "Стейк-салат с говядиной", en: "Beef Steak Salad", th: "สเต็กสลัดเนื้อ" }, desc: "300гр", price: "2 200 тг" },
-          { title: { ru: "Сет из колбасок", en: "Sausage Set", th: "ไส้กรอกรวม" }, desc: "400гр", price: "4 900 тг" },
-          { title: { ru: "Бургер с говядиной", en: "Beef Burger", th: "เบอร์เกอร์เนื้อ" }, desc: "400гр", price: "1 700 тг" }
-        ]
-      },
-      {
-        catId: "soups",
-        catName: { ru: "Супы и выпечка", en: "Soups & Bakery", th: "ซุปและเบเกอรี่" },
-        items: [
-          { title: { ru: "Мексиканский суп с фасолью и говядиной", en: "Mexican Beef & Bean Soup", th: "ซุปเม็กซิกันถั่วและเนื้อวัว" }, desc: "400гр", price: "1 900 тг" },
-          { title: { ru: "Хлебная корзина", en: "Bread Basket", th: "ตะกร้าขนมปัง" }, desc: "200гр", price: "2 200 тг" }
-        ]
-      },
-      {
-        catId: "mains",
-        catName: { ru: "Горячие блюда", en: "Main Courses", th: "อาหารจานหลัก" },
-        items: [
-          { title: { ru: "Стейк New York", en: "New York Steak", th: "นิวยอร์กสเต็ก" }, desc: "200гр", price: "4 300 тг" },
-          { title: { ru: "Пепер-стейк", en: "Pepper Steak", th: "พริกไทยสเต็ก" }, desc: "200гр", price: "4 200 тг" },
-          { title: { ru: "Рулет из куриной грудки с моцареллой и шпинатом", en: "Chicken Breast Roll with Mozzarella & Spinach", th: "ไก่ม้วนยัดไส้ชีสมอสซาเรลล่าและปวยเล้ง" }, desc: "250гр", price: "2 400 тг" },
-          { title: { ru: "Бефстроганов с грибами", en: "Beef Stroganoff with Mushrooms", th: "สโตรกานอฟเนื้อใส่เห็ด" }, desc: "250гр", price: "2 200 тг" },
-          { title: { ru: "Говяжьи ребра «Терияки»", en: "Teriyaki Beef Ribs", th: "ซี่โครงเนื้อเทริยากิ" }, desc: "400гр", price: "4 900 тг" }
-        ]
-      },
-      {
-        catId: "sides",
-        catName: { ru: "Гарниры", en: "Side Dishes", th: "เครื่องเคียง" },
     const menuData = [
       {
         catId: "cold",
@@ -269,7 +218,6 @@
       }
     ];
 
-
     let currentLang = 'ru';
 
     function renderNav() {
@@ -286,6 +234,7 @@
       container.innerHTML = menuData.map(cat => `
         <div id="${cat.catId}">
           <h2 class="section-title">${cat.catName[currentLang]}</h2>
+          ${cat.items.items ? '' : ''}
           ${cat.items.map(item => `
             <div class="menu-card">
               <div class="dish-info">
