@@ -12,7 +12,6 @@
       --text-main: #ffffff;
       --text-muted: #aaaaaa;
       --border: #2a2a2a;
-      --danger: #ff4d4d;
     }
 
     * {
@@ -195,7 +194,7 @@
       cursor: pointer;
     }
 
-    /* Модальное окно оформления */
+    /* Модальное окно */
     .modal {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -293,8 +292,8 @@
     }
 
     .btn-submit {
-      background: #25d366; /* Цвет WhatsApp */
-      color: #fff;
+      background: var(--accent);
+      color: #000;
       border: none;
       padding: 10px;
       border-radius: 10px;
@@ -322,7 +321,7 @@
 
   <div class="container" id="menuContainer"></div>
 
-  <!-- Плавающая панель корзины -->
+  <!-- Панель корзины -->
   <div class="cart-bar" id="cartBar">
     <div class="cart-info">
       <div>Выбрано: <span id="cartCount">0</span> блюд</div>
@@ -348,19 +347,23 @@
 
       <div class="input-group" id="deliveryInputGroup" style="display: none;">
         <label>Контактный телефон:</label>
-        <input type="tel" id="clientPhone" placeholder="+7 (...) ... - .. - ..">
+        <input type="tel" id="clientPhone" placeholder="+48 ... ... ...">
       </div>
 
       <div class="modal-actions">
         <button class="btn-cancel" onclick="closeModal()">Отмена</button>
-        <button class="btn-submit" onclick="sendToWhatsApp()">Отправить в WhatsApp</button>
+        <button class="btn-submit" onclick="sendToTelegram()">Отправить заказ</button>
       </div>
     </div>
   </div>
 
   <script>
-    // ВАЖНО: Замените номер ниже на реальный WhatsApp номер бара (в международном формате без плюса, например: 77011234567)
-    const WHATSAPP_NUMBER = "48452950041";
+    // ----------------------------------------------------
+    // НАСТРОЙКА TELEGRAM БОТА (Вставьте ваши данные сюда)
+    // ----------------------------------------------------
+    const TELEGRAM_BOT_TOKEN = "8875646081: AAGAuhGElW190Eg01RaZTz6EF 4pJM-jFKVs";
+    const TELEGRAM_CHAT_ID = "603052488";
+    // ----------------------------------------------------
 
     const menuData = [
       {
@@ -387,7 +390,7 @@
           { id: 12, title: { ru: "Тарелка пивных креветок", en: "Beer Shrimps Platter", pl: "Krewetki do piwa" }, desc: "180гр", price: 4300 },
           { id: 13, title: { ru: "Хвосты королевских креветок", en: "King Prawn Tails", pl: "Ogonki krewetek królewskich" }, desc: "180гр", price: 5200 },
           { id: 14, title: { ru: "Стейк-салат с говядиной", en: "Beef Steak Salad", pl: "Sałatka ze stekiem wołowym" }, desc: "300гр", price: 2200 },
-          { id: 15, title: { ru: "Сет из колбасок", en: "Sausage Set", pl: "Zestaw kiełbasek" }, desc: "400гр", price: "4900" },
+          { id: 15, title: { ru: "Сет из колбасок", en: "Sausage Set", pl: "Zestaw kiełbasek" }, desc: "400гр", price: 4900 },
           { id: 16, title: { ru: "Бургер с говядиной", en: "Beef Burger", pl: "Burger z wołowiną" }, desc: "400гр", price: 1700 }
         ]
       },
@@ -421,13 +424,13 @@
     ];
 
     let currentLang = 'ru';
-    let cart = {}; // id -> количество
-    let orderType = 'table'; // 'table' или 'delivery'
+    let cart = {};
+    let orderType = 'table';
 
     const translations = {
-      ru: { add: "В корзину", order: "Оформить заказ", title: "Детали заказа", table: "🪑 Столик", delivery: "🚗 Доставка", tableLabel: "Номер столика:", phoneLabel: "Контактный телефон:", cancel: "Отмена", send: "Отправить в WhatsApp" },
-      en: { add: "Add", order: "Checkout", title: "Order Details", table: "🪑 Table", delivery: "🚗 Delivery", tableLabel: "Table number:", phoneLabel: "Contact phone:", cancel: "Cancel", send: "Send to WhatsApp" },
-      pl: { add: "Dodaj", order: "Zamów", title: "Szczegóły zamówienia", table: "🪑 Stolik", delivery: "🚗 Dostawa", tableLabel: "Numer stolika:", phoneLabel: "Telefon kontaktowy:", cancel: "Anuluj", send: "Wyślij na WhatsApp" }
+      ru: { add: "В корзину", order: "Оформить заказ", title: "Детали заказа", table: "🪑 Столик", delivery: "🚗 Доставка", tableLabel: "Номер столика:", phoneLabel: "Контактный телефон:", cancel: "Отмена", send: "Отправить заказ" },
+      en: { add: "Add", order: "Checkout", title: "Order Details", table: "🪑 Table", delivery: "🚗 Delivery", tableLabel: "Table number:", phoneLabel: "Contact phone:", cancel: "Cancel", send: "Send order" },
+      pl: { add: "Dodaj", order: "Zamów", title: "Szczegóły zamówienia", table: "🪑 Stolik", delivery: "🚗 Dostawa", tableLabel: "Numer stolika:", phoneLabel: "Telefon kontaktowy:", cancel: "Anuluj", send: "Wyślij zamówienie" }
     };
 
     function renderNav() {
@@ -477,12 +480,8 @@
       for (let id in cart) {
         let count = cart[id];
         totalCount += count;
-        
-        // Находим блюдо по id
         let item = findItemById(id);
-        if (item) {
-          totalPrice += item.price * count;
-        }
+        if (item) totalPrice += item.price * count;
       }
 
       if (totalCount > 0) {
@@ -559,8 +558,8 @@
       }
     }
 
-    function sendToWhatsApp() {
-      let message = "📝 *Новый заказ из меню Recept:*\n\n";
+    async function sendToTelegram() {
+      let message = "📝 <b>Новый заказ из меню Recept:</b>\n\n";
       
       if (orderType === 'table') {
         let table = document.getElementById('tableNumber').value.trim();
@@ -568,17 +567,17 @@
           alert("Пожалуйста, укажите номер столика!");
           return;
         }
-        message += `🪑 *Тип:* В заведении\n📍 *Столик:* ${table}\n\n`;
+        message += `🪑 <b>Тип:</b> В заведении\n📍 <b>Столик:</b> ${table}\n\n`;
       } else {
         let phone = document.getElementById('clientPhone').value.trim();
         if (!phone) {
           alert("Пожалуйста, укажите контактный телефон!");
           return;
         }
-        message += `🚗 *Тип:* Доставка\n📞 *Телефон:* ${phone}\n\n`;
+        message += `🚗 <b>Тип:</b> Доставка\n📞 <b>Телефон:</b> ${phone}\n\n`;
       }
 
-      message += "*Состав заказа:*\n";
+      message += "<b>Состав заказа:</b>\n";
       let totalPrice = 0;
 
       for (let id in cart) {
@@ -587,15 +586,37 @@
         if (item) {
           let cost = item.price * count;
           totalPrice += cost;
-          message += `- ${item.title['ru']} x${count} (${cost.toLocaleString()} тг)\n`;
+          message += `• ${item.title['ru']} x${count} (${cost.toLocaleString()} тг)\n`;
         }
       }
 
-      message += `\n💰 *Итого к оплате:* ${totalPrice.toLocaleString()} тг`;
+      message += `\n💰 <b>Итого к оплате:</b> ${totalPrice.toLocaleString()} тг`;
 
-      // Кодируем ссылку для WhatsApp
-      let url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-      window.open(url, '_blank');
+      // Отправка в Telegram прямо с сайта без открытия сторонних приложений
+      const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+      
+      try {
+        let response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: TELEGRAM_CHAT_ID,
+            text: message,
+            parse_mode: 'HTML'
+          })
+        });
+
+        if (response.ok) {
+          alert("Спасибо! Ваш заказ успешно отправлен в бар.");
+          cart = {};
+          updateCartBar();
+          closeModal();
+        } else {
+          alert("Ошибка отправки. Проверьте настройки бота.");
+        }
+      } catch (error) {
+        alert("Ошибка сети. Попробуйте еще раз.");
+      }
     }
 
     renderNav();
