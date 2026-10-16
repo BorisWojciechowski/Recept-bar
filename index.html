@@ -12,6 +12,7 @@
       --text-main: #ffffff;
       --text-muted: #aaaaaa;
       --border: #2a2a2a;
+      --danger: #ff4d4d;
     }
 
     * {
@@ -24,7 +25,7 @@
     body {
       background-color: var(--bg-color);
       color: var(--text-main);
-      padding-bottom: 30px;
+      padding-bottom: 90px;
     }
 
     header {
@@ -114,7 +115,7 @@
       margin-bottom: 10px;
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
+      align-items: center;
       gap: 12px;
     }
 
@@ -131,13 +132,175 @@
     .dish-desc {
       font-size: 13px;
       color: var(--text-muted);
+      margin-bottom: 6px;
     }
 
     .dish-price {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: bold;
       color: var(--accent);
+    }
+
+    .add-btn {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 13px;
+      cursor: pointer;
       white-space: nowrap;
+    }
+
+    /* Плавающая панель корзины */
+    .cart-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #1a1a1a;
+      border-top: 1px solid var(--accent);
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 200;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.5);
+      display: none;
+    }
+
+    .cart-bar.visible {
+      display: flex;
+    }
+
+    .cart-info {
+      font-size: 14px;
+    }
+
+    .cart-total {
+      font-weight: bold;
+      color: var(--accent);
+      font-size: 16px;
+    }
+
+    .checkout-btn {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    /* Модальное окно оформления */
+    .modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.8);
+      z-index: 300;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      display: none;
+    }
+
+    .modal.open {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 16px;
+      color: var(--accent);
+      text-align: center;
+    }
+
+    .type-switcher {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .type-btn {
+      flex: 1;
+      padding: 10px;
+      background: #2a2a2a;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .type-btn.active {
+      background: var(--accent);
+      color: #000;
+      border-color: var(--accent);
+    }
+
+    .input-group {
+      margin-bottom: 16px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .input-group input {
+      width: 100%;
+      background: #121212;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-cancel {
+      background: #2a2a2a;
+      color: var(--text-main);
+      border: none;
+      padding: 10px;
+      border-radius: 10px;
+      flex: 1;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .btn-submit {
+      background: #25d366; /* Цвет WhatsApp */
+      color: #fff;
+      border: none;
+      padding: 10px;
+      border-radius: 10px;
+      flex: 2;
+      cursor: pointer;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -159,66 +322,113 @@
 
   <div class="container" id="menuContainer"></div>
 
+  <!-- Плавающая панель корзины -->
+  <div class="cart-bar" id="cartBar">
+    <div class="cart-info">
+      <div>Выбрано: <span id="cartCount">0</span> блюд</div>
+      <div class="cart-total" id="cartTotal">0 тг</div>
+    </div>
+    <button class="checkout-btn" onclick="openModal()">Оформить заказ</button>
+  </div>
+
+  <!-- Модальное окно -->
+  <div class="modal" id="orderModal">
+    <div class="modal-content">
+      <div class="modal-title">Детали заказа</div>
+      
+      <div class="type-switcher">
+        <button class="type-btn active" id="typeTableBtn" onclick="setOrderType('table')">🪑 Столик</button>
+        <button class="type-btn" id="typeDeliveryBtn" onclick="setOrderType('delivery')">🚗 Доставка</button>
+      </div>
+
+      <div class="input-group" id="tableInputGroup">
+        <label>Номер столика:</label>
+        <input type="text" id="tableNumber" placeholder="Например: Стол №5">
+      </div>
+
+      <div class="input-group" id="deliveryInputGroup" style="display: none;">
+        <label>Контактный телефон:</label>
+        <input type="tel" id="clientPhone" placeholder="+7 (...) ... - .. - ..">
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal()">Отмена</button>
+        <button class="btn-submit" onclick="sendToWhatsApp()">Отправить в WhatsApp</button>
+      </div>
+    </div>
+  </div>
+
   <script>
+    // ВАЖНО: Замените номер ниже на реальный WhatsApp номер бара (в международном формате без плюса, например: 77011234567)
+    const WHATSAPP_NUMBER = "48452950041";
+
     const menuData = [
       {
         catId: "cold",
         catName: { ru: "Холодные закуски и салаты", en: "Cold Appetizers & Salads", pl: "Zimne przekąski i sałatki" },
         items: [
-          { title: { ru: "Тар-тар из семги", en: "Salmon Tartare", pl: "Tatar z łososia" }, desc: "250гр", price: "2 400 тг" },
-          { title: { ru: "Филе скумбрии с горячим картофелем", en: "Mackerel Fillet with Hot Potatoes", pl: "Filet z makreli z gorącymi ziemniakami" }, desc: "250гр", price: "1 700 тг" },
-          { title: { ru: "Сырная тарелка", en: "Cheese Platter", pl: "Deska serów" }, desc: "180гр", price: "1 900 тг" },
-          { title: { ru: "Рыбная нарезка", en: "Fish Platter", pl: "Półmisek rybny" }, desc: "200гр", price: "2 700 тг" },
-          { title: { ru: "Нарезка по-казахски", en: "Kazakh Style Meat Platter", pl: "Półmisek mięsny po kazachsku" }, desc: "200гр", price: "3 900 тг" },
-          { title: { ru: "Паштет из говяжей печени", en: "Beef Liver Pate", pl: "Pasztet z wątróbki wołowej" }, desc: "150гр", price: "900 тг" },
-          { title: { ru: "Цезарь с курицей", en: "Chicken Caesar Salad", pl: "Sałatka Cezar z kurczakiem" }, desc: "300гр", price: "1 800 тг" },
-          { title: { ru: "Оливки, маслины", en: "Olives", pl: "Oliwki" }, desc: "150гр", price: "900 тг" },
-          { title: { ru: "Фруктовая нарезка", en: "Fruit Platter", pl: "Półmisek owoców" }, desc: "400гр", price: "5 500 тг" }
+          { id: 1, title: { ru: "Тар-тар из семги", en: "Salmon Tartare", pl: "Tatar z łososia" }, desc: "250гр", price: 2400 },
+          { id: 2, title: { ru: "Филе скумбрии с горячим картофелем", en: "Mackerel Fillet with Hot Potatoes", pl: "Filet z makreli z gorącymi ziemniakami" }, desc: "250гр", price: 1700 },
+          { id: 3, title: { ru: "Сырная тарелка", en: "Cheese Platter", pl: "Deska serów" }, desc: "180гр", price: 1900 },
+          { id: 4, title: { ru: "Рыбная нарезка", en: "Fish Platter", pl: "Półmisek rybny" }, desc: "200гр", price: 2700 },
+          { id: 5, title: { ru: "Нарезка по-казахски", en: "Kazakh Style Meat Platter", pl: "Półmisek mięsny po kazachsku" }, desc: "200гр", price: 3900 },
+          { id: 6, title: { ru: "Паштет из говяжей печени", en: "Beef Liver Pate", pl: "Pasztet z wątróbki wołowej" }, desc: "150гр", price: 900 },
+          { id: 7, title: { ru: "Цезарь с курицей", en: "Chicken Caesar Salad", pl: "Sałatka Cezar z kurczakiem" }, desc: "300гр", price: 1800 },
+          { id: 8, title: { ru: "Оливки, маслины", en: "Olives", pl: "Oliwki" }, desc: "150гр", price: 900 },
+          { id: 9, title: { ru: "Фруктовая нарезка", en: "Fruit Platter", pl: "Półmisek owoców" }, desc: "400гр", price: 5500 }
         ]
       },
       {
         catId: "hot_snack",
         catName: { ru: "Горячие закуски", en: "Hot Appetizers", pl: "Gorące przekąski" },
         items: [
-          { title: { ru: "Брускетта с говядиной и корнишонами", en: "Bruschetta with Beef & Gherkins", pl: "Bruschetta z wołowiną i korniszonami" }, desc: "180гр", price: "1 300 тг" },
-          { title: { ru: "Брускетта с риккотой и вялеными помидорами", en: "Bruschetta with Ricotta & Sun-dried Tomatoes", pl: "Bruschetta z ricottą i suszonymi pomidorami" }, desc: "150гр", price: "1 100 тг" },
-          { title: { ru: "Тарелка пивных креветок", en: "Beer Shrimps Platter", pl: "Krewetki do piwa" }, desc: "180гр", price: "4 300 тг" },
-          { title: { ru: "Хвосты королевских креветок", en: "King Prawn Tails", pl: "Ogonki krewetek królewskich" }, desc: "180гр", price: "5 200 тг" },
-          { title: { ru: "Стейк-салат с говядиной", en: "Beef Steak Salad", pl: "Sałatka ze stekiem wołowym" }, desc: "300гр", price: "2 200 тг" },
-          { title: { ru: "Сет из колбасок", en: "Sausage Set", pl: "Zestaw kiełbasek" }, desc: "400гр", price: "4 900 тг" },
-          { title: { ru: "Бургер с говядиной", en: "Beef Burger", pl: "Burger z wołowiną" }, desc: "400гр", price: "1 700 тг" }
+          { id: 10, title: { ru: "Брускетта с говядиной и корнишонами", en: "Bruschetta with Beef & Gherkins", pl: "Bruschetta z wołowiną i korniszonami" }, desc: "180гр", price: 1300 },
+          { id: 11, title: { ru: "Брускетта с риккотой и вялеными помидорами", en: "Bruschetta with Ricotta & Sun-dried Tomatoes", pl: "Bruschetta z ricottą i suszonymi pomidorami" }, desc: "150гр", price: 1100 },
+          { id: 12, title: { ru: "Тарелка пивных креветок", en: "Beer Shrimps Platter", pl: "Krewetki do piwa" }, desc: "180гр", price: 4300 },
+          { id: 13, title: { ru: "Хвосты королевских креветок", en: "King Prawn Tails", pl: "Ogonki krewetek królewskich" }, desc: "180гр", price: 5200 },
+          { id: 14, title: { ru: "Стейк-салат с говядиной", en: "Beef Steak Salad", pl: "Sałatka ze stekiem wołowym" }, desc: "300гр", price: 2200 },
+          { id: 15, title: { ru: "Сет из колбасок", en: "Sausage Set", pl: "Zestaw kiełbasek" }, desc: "400гр", price: "4900" },
+          { id: 16, title: { ru: "Бургер с говядиной", en: "Beef Burger", pl: "Burger z wołowiną" }, desc: "400гр", price: 1700 }
         ]
       },
       {
         catId: "soups",
         catName: { ru: "Супы и выпечка", en: "Soups & Bakery", pl: "Zupy i wypieki" },
         items: [
-          { title: { ru: "Мексиканский суп с фасолью и говядиной", en: "Mexican Beef & Bean Soup", pl: "Meksykańska zupa z fasolą i wołowiną" }, desc: "400гр", price: "1 900 тг" },
-          { title: { ru: "Хлебная корзина", en: "Bread Basket", pl: "Koszyk pieczywa" }, desc: "200гр", price: "2 200 тг" }
+          { id: 17, title: { ru: "Мексиканский суп с фасолью и говядиной", en: "Mexican Beef & Bean Soup", pl: "Meksykańska zupa z fasolą i wołowiną" }, desc: "400гр", price: 1900 },
+          { id: 18, title: { ru: "Хлебная корзина", en: "Bread Basket", pl: "Koszyk pieczywa" }, desc: "200гр", price: 2200 }
         ]
       },
       {
         catId: "mains",
         catName: { ru: "Горячие блюда", en: "Main Courses", pl: "Dania główne" },
         items: [
-          { title: { ru: "Стейк New York", en: "New York Steak", pl: "Stek New York" }, desc: "200гр", price: "4 300 тг" },
-          { title: { ru: "Пепер-стейк", en: "Pepper Steak", pl: "Stek pieprzowy" }, desc: "200гр", price: "4 200 тг" },
-          { title: { ru: "Рулет из куриной грудки с моцареллой и шпинатом", en: "Chicken Breast Roll with Mozzarella & Spinach", pl: "Roladka z piersi kurczaka z mozzarellą i szpinakiem" }, desc: "250гр", price: "2 400 тг" },
-          { title: { ru: "Бефстроганов с грибами", en: "Beef Stroganoff with Mushrooms", pl: "Boeuf Stroganoff z grzybami" }, desc: "250гр", price: "2 200 тг" },
-          { title: { ru: "Говяжьи ребра «Терияки»", en: "Teriyaki Beef Ribs", pl: "Żeberka wołowe w sosie teriyaki" }, desc: "400гр", price: "4 900 тг" }
+          { id: 19, title: { ru: "Стейк New York", en: "New York Steak", pl: "Stek New York" }, desc: "200гр", price: 4300 },
+          { id: 20, title: { ru: "Пепер-стейк", en: "Pepper Steak", pl: "Stek pieprzowy" }, desc: "200гр", price: 4200 },
+          { id: 21, title: { ru: "Рулет из куриной грудки с моцареллой и шпинатом", en: "Chicken Breast Roll with Mozzarella & Spinach", pl: "Roladka z piersi kurczaka z mozzarellą i szpinakiem" }, desc: "250гр", price: 2400 },
+          { id: 22, title: { ru: "Бефстроганов с грибами", en: "Beef Stroganoff with Mushrooms", pl: "Boeuf Stroganoff z grzybami" }, desc: "250гр", price: 2200 },
+          { id: 23, title: { ru: "Говяжьи ребра «Терияки»", en: "Teriyaki Beef Ribs", pl: "Żeberka wołowe w sosie teriyaki" }, desc: "400гр", price: 4900 }
         ]
       },
       {
         catId: "sides",
         catName: { ru: "Гарниры", en: "Side Dishes", pl: "Dodatki" },
         items: [
-          { title: { ru: "Овощи-гриль с сыром рикотта", en: "Grilled Vegetables with Ricotta", pl: "Warzywa z grilla z serem ricotta" }, desc: "250гр", price: "1 300 тг" },
-          { title: { ru: "Картофель фри", en: "French Fries", pl: "Frytki" }, desc: "150гр", price: "500 тг" }
+          { id: 24, title: { ru: "Овощи-гриль с сыром рикотта", en: "Grilled Vegetables with Ricotta", pl: "Warzywa z grilla z serem ricotta" }, desc: "250гр", price: 1300 },
+          { id: 25, title: { ru: "Картофель фри", en: "French Fries", pl: "Frytki" }, desc: "150гр", price: 500 }
         ]
       }
     ];
 
     let currentLang = 'ru';
+    let cart = {}; // id -> количество
+    let orderType = 'table'; // 'table' или 'delivery'
+
+    const translations = {
+      ru: { add: "В корзину", order: "Оформить заказ", title: "Детали заказа", table: "🪑 Столик", delivery: "🚗 Доставка", tableLabel: "Номер столика:", phoneLabel: "Контактный телефон:", cancel: "Отмена", send: "Отправить в WhatsApp" },
+      en: { add: "Add", order: "Checkout", title: "Order Details", table: "🪑 Table", delivery: "🚗 Delivery", tableLabel: "Table number:", phoneLabel: "Contact phone:", cancel: "Cancel", send: "Send to WhatsApp" },
+      pl: { add: "Dodaj", order: "Zamów", title: "Szczegóły zamówienia", table: "🪑 Stolik", delivery: "🚗 Dostawa", tableLabel: "Numer stolika:", phoneLabel: "Telefon kontaktowy:", cancel: "Anuluj", send: "Wyślij na WhatsApp" }
+    };
 
     function renderNav() {
       const nav = document.getElementById('catNav');
@@ -231,27 +441,85 @@
 
     function renderMenu() {
       const container = document.getElementById('menuContainer');
+      const t = translations[currentLang];
+      
       container.innerHTML = menuData.map(cat => `
         <div id="${cat.catId}">
           <h2 class="section-title">${cat.catName[currentLang]}</h2>
-          ${cat.items.items ? '' : ''}
           ${cat.items.map(item => `
             <div class="menu-card">
               <div class="dish-info">
                 <div class="dish-title">${item.title[currentLang]}</div>
                 <div class="dish-desc">${item.desc}</div>
+                <div class="dish-price">${Number(item.price).toLocaleString()} тг</div>
               </div>
-              <div class="dish-price">${item.price}</div>
+              <button class="add-btn" onclick="addToCart(${item.id})">${t.add}${cart[item.id] ? '('+cart[item.id]+')' : ''}</button>
             </div>
           `).join('')}
         </div>
       `).join('');
     }
 
+    function addToCart(id) {
+      cart[id] = (cart[id] || 0) + 1;
+      updateCartBar();
+      renderMenu();
+    }
+
+    function updateCartBar() {
+      const cartBar = document.getElementById('cartBar');
+      const cartCount = document.getElementById('cartCount');
+      const cartTotal = document.getElementById('cartTotal');
+      
+      let totalCount = 0;
+      let totalPrice = 0;
+
+      for (let id in cart) {
+        let count = cart[id];
+        totalCount += count;
+        
+        // Находим блюдо по id
+        let item = findItemById(id);
+        if (item) {
+          totalPrice += item.price * count;
+        }
+      }
+
+      if (totalCount > 0) {
+        cartBar.classList.add('visible');
+        cartCount.innerText = totalCount;
+        cartTotal.innerText = totalPrice.toLocaleString() + " тг";
+      } else {
+        cartBar.classList.remove('visible');
+      }
+    }
+
+    function findItemById(id) {
+      for (let cat of menuData) {
+        for (let item of cat.items) {
+          if (item.id == id) return item;
+        }
+      }
+      return null;
+    }
+
     function changeLang(lang) {
       currentLang = lang;
       renderNav();
       renderMenu();
+      updateTexts();
+    }
+
+    function updateTexts() {
+      const t = translations[currentLang];
+      document.querySelector('.modal-title').innerText = t.title;
+      document.getElementById('typeTableBtn').innerText = t.table;
+      document.getElementById('typeDeliveryBtn').innerText = t.delivery;
+      document.querySelector('#tableInputGroup label').innerText = t.tableLabel;
+      document.querySelector('#deliveryInputGroup label').innerText = t.phoneLabel;
+      document.querySelector('.btn-cancel').innerText = t.cancel;
+      document.querySelector('.btn-submit').innerText = t.send;
+      document.querySelector('.checkout-btn').innerText = t.order;
     }
 
     function scrollToCat(id, btn) {
@@ -266,6 +534,68 @@
         const offsetPosition = elementPosition - offset;
         window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
       }
+    }
+
+    function openModal() {
+      document.getElementById('orderModal').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('orderModal').classList.remove('open');
+    }
+
+    function setOrderType(type) {
+      orderType = type;
+      if (type === 'table') {
+        document.getElementById('typeTableBtn').classList.add('active');
+        document.getElementById('typeDeliveryBtn').classList.remove('active');
+        document.getElementById('tableInputGroup').style.display = 'block';
+        document.getElementById('deliveryInputGroup').style.display = 'none';
+      } else {
+        document.getElementById('typeDeliveryBtn').classList.add('active');
+        document.getElementById('typeTableBtn').classList.remove('active');
+        document.getElementById('tableInputGroup').style.display = 'none';
+        document.getElementById('deliveryInputGroup').style.display = 'block';
+      }
+    }
+
+    function sendToWhatsApp() {
+      let message = "📝 *Новый заказ из меню Recept:*\n\n";
+      
+      if (orderType === 'table') {
+        let table = document.getElementById('tableNumber').value.trim();
+        if (!table) {
+          alert("Пожалуйста, укажите номер столика!");
+          return;
+        }
+        message += `🪑 *Тип:* В заведении\n📍 *Столик:* ${table}\n\n`;
+      } else {
+        let phone = document.getElementById('clientPhone').value.trim();
+        if (!phone) {
+          alert("Пожалуйста, укажите контактный телефон!");
+          return;
+        }
+        message += `🚗 *Тип:* Доставка\n📞 *Телефон:* ${phone}\n\n`;
+      }
+
+      message += "*Состав заказа:*\n";
+      let totalPrice = 0;
+
+      for (let id in cart) {
+        let item = findItemById(id);
+        let count = cart[id];
+        if (item) {
+          let cost = item.price * count;
+          totalPrice += cost;
+          message += `- ${item.title['ru']} x${count} (${cost.toLocaleString()} тг)\n`;
+        }
+      }
+
+      message += `\n💰 *Итого к оплате:* ${totalPrice.toLocaleString()} тг`;
+
+      // Кодируем ссылку для WhatsApp
+      let url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+      window.open(url, '_blank');
     }
 
     renderNav();
