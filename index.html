@@ -359,9 +359,9 @@
 
   <script>
     // ----------------------------------------------------
-    // НАСТРОЙКА TELEGRAM БОТА (Вставьте ваши данные сюда)
+    // НАСТРОЙКИ TELEGRAM БОТА (ТОКЕН И ЧАТ ID ОЧИЩЕНЫ)
     // ----------------------------------------------------
-    const TELEGRAM_BOT_TOKEN = "8875646081: AAGAuhGE1W190Eg01RaZTz6EF 4pJM-jFKVs";
+    const TELEGRAM_BOT_TOKEN = "8875646081:AAGAuhGE1W190Eg01RaZTz6EF4pJM-jFKVs";
     const TELEGRAM_CHAT_ID = "603052488";
     // ----------------------------------------------------
 
@@ -592,7 +592,6 @@
 
       message += `\n💰 <b>Итого к оплате:</b> ${totalPrice.toLocaleString()} тг`;
 
-      // Отправка в Telegram прямо с сайта без открытия сторонних приложений
       const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
       
       try {
@@ -612,7 +611,7 @@
           updateCartBar();
           closeModal();
         } else {
-          alert("Ошибка отправки. Проверьте настройки бота.");
+          alert("Ошибка отправки. Убедитесь, что вы запустили бота в Telegram!");
         }
       } catch (error) {
         alert("Ошибка сети. Попробуйте еще раз.");
